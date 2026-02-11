@@ -49,7 +49,7 @@ Invoke-PUG -Path .\test.pug -Data @{
 
 # Example 2: Pipe content directly with a scriptblock filter
 @"
-div:
+div
     :MyFilter
         Content
 "@ | Invoke-PUG -Filters {
