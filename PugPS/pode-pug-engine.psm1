@@ -95,7 +95,7 @@ Function Set-PodeViewEnginePug {
                     -ErrorContextRange $using:ErrorContextRange
                 
                 # debug
-                $psCode | Out-File "_generated_template_.ps1"
+                #$psCode | Out-File "_generated_template_.ps1"
                 
                 # 2. Create ScriptBlock
                 $sb = [scriptblock]::Create($psCode)
@@ -155,6 +155,7 @@ Function Set-PodeViewEnginePug {
         }
     }
 }
+
 
 
 Export-ModuleMember -Function Set-PodeViewEnginePug
