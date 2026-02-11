@@ -6,6 +6,23 @@ PugPS is a PowerShell-native implementation of the Pug (formerly Jade) templatin
 
 ---
 
+## 📦 Installation
+
+Currently Released:
+```powershell
+Install-Module -name PugPS
+```
+
+<details>
+<summary>Latest version:</summary>
+
+```powershell
+git clone https://github.com/BananaAcid/PugPS.git
+```
+</details>
+
+---
+
 ## 🚀 Usage in Pode
 
 To use PugPS as your view engine in a [Pode](https://badgerati.github.io/Pode/) server, import the module and initialize the engine within your `Start-PodeServer` block.
@@ -13,7 +30,7 @@ To use PugPS as your view engine in a [Pode](https://badgerati.github.io/Pode/) 
 ```powershell
 Start-PodeServer {
     # Import the view engine module
-    Import-Module .\PugPS\PugPS
+    Import-Module PugPS
     
     # Configure the engine
     Set-PodeViewEnginePug -Extension 'pode.pug' -ErrorOutput 'text'
@@ -41,7 +58,7 @@ Start-PodeServer {
 Use `Invoke-PUG` for automation, build pipelines, or one-off conversions.
 
 ```powershell
-Import-Module .\PugPS\PugPS
+Import-Module PugPS
 
 # Example 1: Convert a file with data and external filters
 Invoke-PUG -Path .\test.pug -Data @{
@@ -201,8 +218,15 @@ Are supported as defined by PugJS.
 
 If you need to generate the PowerShell script representation of a Pug file without immediately rendering it, use `Convert-PugToPowerShell`.
 
+You need to save the module into your project first:
 ```powershell
-. .\PugPS\parser.ps1
+Save-Module -Name PugPS -Path .\   # this creates a subfolder .\PugPS\1.0.0\
+```
+
+Then use it:
+
+```powershell
+. .\PugPS\1.0.0\parser.ps1
 $psCode = Convert-PugToPowerShell -Path "template.pug" -KebabCaseHTML $true
 ```
 
@@ -218,11 +242,3 @@ $psCode = Convert-PugToPowerShell -Path "template.pug" -KebabCaseHTML $true
 | **-ContainerTagsSelfClosing** | `bool` | No | `$false` | Render empty containers with `/`. |
 | **-KebabCaseHTML** | `bool` | No | `$true` | Convert `CamelCase` tags to `kebab-case`. |
 | **-ErrorContextRange** | `int` | No | `2` | Error context line count. |
-
----
-
-## 📦 Installation
-
-```powershell
-git clone https://github.com/BananaAcid/PugPS.git
-```
