@@ -133,7 +133,8 @@ PugPS supports standard PowerShell logic using the `-` prefix.
 
 ---
 
-> [!NOTE]
-> The Complete Readme is here:
+## Note
+
+> **The Complete Readme is here:**
 >
 > https://github.com/BananaAcid/PugPS/blob/main/README.md
