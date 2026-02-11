@@ -1,3 +1,6 @@
+# Fix for -> Write-Error: Failed to generate the compressed file for module 'Cannot index into a null array.'.
+$env:DOTNET_CLI_UI_LANGUAGE="en_US"
+
 
 Test-ModuleManifest -Path ".\PugPS\PugPS.psd1"
 pause
