@@ -62,19 +62,19 @@ div
 
 ### `Invoke-PUG` Parameters
 
-| Parameter | Type | Req | Set | Default | Description |
-| :--- | :--- | :---: | :--- | :--- | :--- |
-| **-Path** | `string` | Yes | Path | - | The path to the Pug template file. |
-| **-InputContent** | `string[]` | Yes | Cont | - | The raw Pug template content (supports pipeline input). |
-| **-Data** | `hashtable` | No | Both | `@{}` | The data passed to the template as `$data`. |
-| **-Filters** | `sb\|string` | No | Both | `$null` | Path to filters file (ps1) or a scriptblock with filter functions. |
-| **-Extension** | `string` | No | Both | `'pug'` | The default file extension to use for included files. |
-| **-BaseDir** | `string` | No | Both | `""` | Root directory used to resolve absolute include/extend paths. |
-| **-Properties** | `bool` | No | Both | `$true` | If `$true`, boolean attributes render as `attr`. |
-| **-VoidTagsSelfClosing** | `bool` | No | Both | `$false` | If `$true`, void tags render with a self-closing slash. |
-| **-ContainerTagsSelfClosing** | `bool` | No | Both | `$false` | If `$true`, empty container tags render as self-closing. |
-| **-KebabCaseHTML** | `bool` | No | Both | `$true` | If `$true`, converts `CamelCase` tags to `kebab-case`. |
-| **-ErrorContextRange** | `int` | No | Both | `2` | Context lines to show before/after error line. |
+| Parameter | Type | Req | Default | Description |
+| :--- | :--- | :---: | :--- | :--- |
+| **-Path** | `string` | Yes* | - | Path to Pug Template file (Mandatory if not using pipeline). |
+| **-InputContent** | `string[]` | Yes* | - | The raw Pug template content (supports pipeline input). |
+| **-Data** | `hashtable` | No | `@{}` | The data passed to the template as `$data`. |
+| **-Filters** | `sb\|string` | No | `$null` | Path to filters file (ps1) or a scriptblock with filter functions. |
+| **-Extension** | `string` | No | `'pug'` | The default file extension to use for included files. |
+| **-BaseDir** | `string` | No | `""` | Root directory used to resolve absolute include/extend paths. |
+| **-Properties** | `bool` | No | `$true` | If `$true`, boolean attributes render as `attr`. |
+| **-VoidTagsSelfClosing** | `bool` | No | `$false` | If `$true`, void tags render with a self-closing slash. |
+| **-ContainerTagsSelfClosing** | `bool` | No | `$false` | If `$true`, empty container tags render as self-closing. |
+| **-KebabCaseHTML** | `bool` | No | `$true` | If `$true`, converts `CamelCase` tags to `kebab-case`. |
+| **-ErrorContextRange** | `int` | No | `2` | Context lines to show before/after error line. |
 
 ---
 
@@ -207,7 +207,8 @@ $psCode = Convert-PugToPowerShell -Path "template.pug" -KebabCaseHTML $true
 ### `Convert-PugToPowerShell` Parameters
 | Parameter | Type | Req | Default | Description |
 | :--- | :--- | :---: | :--- | :--- |
-| **-Path** | `string` | No* | - | Path to file (Mandatory if not using pipeline). |
+| **-Path** | `string` | Yes* | - | Path to Pug Template file (Mandatory if not using pipeline). |
+| **-InputContent** | `string[]` | Yes* | - | The raw Pug template content (supports pipeline input). |
 | **-Extension** | `string` | No | `'pug'` | Extension for included files. |
 | **-BaseDir** | `string` | No | `""` | Root directory for absolute paths. |
 | **-Properties** | `bool` | No | `$true` | Render boolean attributes as `attr`. |
