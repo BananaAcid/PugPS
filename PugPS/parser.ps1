@@ -436,7 +436,7 @@ function Convert-PugToPowerShell {
                     foreach ($pair in (Get-PugAttributePairs $attrString)) {
                         if ($pair -match '^([^!=]+)\s*(!?=)\s*(.*)$') {
                             $ak = $matches[1].Trim(); $ao = $matches[2]; $val = $matches[3].Trim()
-                            $parts.Add("(Out-PugAttr '$ak' ($val) " + ($ao -eq '=' ? '$true' : '$false') + ")")
+                            $parts.Add("(Out-PugAttr '$ak' ($val) " + $(if ($ao -eq '=') { '$true' } else { '$false' }) + ")")
                         } else { $parts.Add("(Out-PugAttr '$pair' `$true `$false)") }
                     }
                 }
@@ -620,7 +620,7 @@ function Out-PugStyle($v) {
 function Out-PugAttr($k, $v, $e) {
     if ($null -eq $v -or ($v -is [bool] -and !$v)) { return "" }
     if ($v -is [bool] -and $v) { 
-        return $pug_props ? " $k" : " $k=`"$k`""
+        return $(if ($pug_props) { " $k" } else { " $k=`"$k`"" })
     }
     $s = $(if ($k -eq "class") { Out-PugClass $v } 
          elseif ($k -eq "style") { Out-PugStyle $v }
@@ -1074,7 +1074,7 @@ function Out-PugMergedAttrs($inline, $exploded) {
                                     $psVal = $val 
                                 }
                                 if ($ak -eq "class") { $dynClasses.Add($psVal) }
-                                else { $exprs.Add("(Out-PugAttr '$ak' ($psVal) " + ($ao -eq '=' ? '$true' : '$false') + ")") }
+                                else { $exprs.Add("(Out-PugAttr '$ak' ($psVal) " + $(if ($ao -eq '=') { '$true' } else { '$false' }) + ")") }
                             } else { $ak = $pair.Trim(); if ($ak) { $exprs.Add("(Out-PugAttr '$ak' `$true `$false)") } }
                         }
                     }
