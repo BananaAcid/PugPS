@@ -402,20 +402,28 @@ function Convert-PugToPowerShell {
         function ConvertTo-PugInterpolatedTag {
             param([string]$inner, [bool]$xmlMode)
             if ($inner -match $tagRegex) {
-                $tagName = if ($matches[1] -and $matches[1] -notmatch '^[#.]') { $matches[1] } else { "div" }
+                $tagMatch = $matches
+                $tagName = "div"
+                if ($tagMatch[1] -and $tagMatch[1] -notmatch '^[#.]') {
+                    $tagName = $tagMatch[1]
+                }
                 
                 # OPTIMIZATION: Convert CamelCase to kebab-case if not XML
                 if (-not $xmlMode -and $KebabCaseHTML -and $tagName -cmatch '[A-Z]') {
                     $tagName = ($tagName -creplace '([a-zA-Z0-9-])([A-Z])', '$1-$2').ToLower()
                 }
 
-                $id = if ($matches[1] -match '^#') { $matches[1].Substring(1) } else { $matches[2] }
-                $rawClass = if ($matches[1] -match '^\.') { $matches[1] } else { $matches[3] }
+                $id = if ($tagMatch[1] -match '^#') { $tagMatch[1].Substring(1) } else { $tagMatch[2] }
+                
+                $rawClass = ""
+                if ($tagMatch[1] -match '^\.') { $rawClass = $tagMatch[1] }
+                if ($tagMatch[3]) { $rawClass += "." + $tagMatch[3] }
+                
                 $classes = if ($rawClass) { $rawClass.Split('.') | Where-Object { $_ } | ForEach-Object { "'$_'" } } else { @() }
-                $attrString = $matches[4]
-                $explicitSlash = [bool]$matches[5]
-                $operator = $matches[6]
-                $inlineContent = $matches[7]
+                $attrString = $tagMatch[4]
+                $explicitSlash = [bool]$tagMatch[5]
+                $operator = $tagMatch[6]
+                $inlineContent = $tagMatch[7]
 
                 $isVoid = $voidTags -contains $tagName
                 $hasContent = ![string]::IsNullOrEmpty($inlineContent)
@@ -975,20 +983,28 @@ function Out-PugMergedAttrs($inline, $exploded) {
             }
 
             if ($lineForTag -match $tagRegex) {
-                $tagName = if ($matches[1] -and $matches[1] -notmatch '^[#.]') { $matches[1] } else { "div" }
+                $tagMatch = $matches
+                $tagName = "div"
+                if ($tagMatch[1] -and $tagMatch[1] -notmatch '^[#.]') {
+                    $tagName = $tagMatch[1]
+                }
                 
                 # OPTIMIZATION: Convert CamelCase to kebab-case if not XML
                 if (-not $isXmlMode -and $KebabCaseHTML -and $tagName -cmatch '[A-Z]') {
                     $tagName = ($tagName -creplace '([a-zA-Z0-9-])([A-Z])', '$1-$2').ToLower()
                 }
 
-                $id = if ($matches[1] -match '^#') { $matches[1].Substring(1) } else { $matches[2] }
-                $rawClass = if ($matches[1] -match '^\.') { $matches[1] } else { $matches[3] }
+                $id = if ($tagMatch[1] -match '^#') { $tagMatch[1].Substring(1) } else { $tagMatch[2] }
+
+                $rawClass = ""
+                if ($tagMatch[1] -match '^\.') { $rawClass = $tagMatch[1] }
+                if ($tagMatch[3]) { $rawClass += "." + $tagMatch[3] }
+
                 $classes = if ($rawClass) { $rawClass.Split('.') | Where-Object { $_ } | ForEach-Object { Out-PSLiteral $_ } } else { @() }
-                $attrString = $matches[4]
-                $explicitSlash = [bool]$matches[5]
-                $operator = $matches[6]
-                $inlineContent = $matches[7]
+                $attrString = $tagMatch[4]
+                $explicitSlash = [bool]$tagMatch[5]
+                $operator = $tagMatch[6]
+                $inlineContent = $tagMatch[7]
                 
                 $hasNested = ($nextContentIndent -gt $indent)
 
