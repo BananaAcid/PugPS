@@ -103,6 +103,14 @@ PugPS supports standard PowerShell logic using the `-` prefix.
         li Status Unknown
 ```
 
+#### NOTE: PugJS's Case, Conditionals, Iteration
+- these can be done with `- Foreach`, `- If`, `- For` ... while keeping the powershell syntax (the PugJS specific implementation is not supported)
+    - https://pugjs.org/language/case.html
+    - https://pugjs.org/language/conditionals.html
+    - https://pugjs.org/language/iteration.html
+
+
+
 ### 2. Classes and Styles
 PugPS handles PowerShell collections intelligently for clean attribute management.
 
@@ -131,6 +139,9 @@ PugPS handles PowerShell collections intelligently for clean attribute managemen
 - `attr='$a'`  var will not be parsed (singe quotes),
 - `attr="$a"`  var will be parsed (double quotes),
 - `$attr=$a`   var will be parsed (no quotes).
+
+#### Note: Attributes with Code
+For `body(class=$authenticated ? 'authed' : 'anon' ...)` and alike, you should use `body(class=$($authenticated ? 'authed' : 'anon') ...)` - wrapping the logic in `$()`
 
 ### 4. Filters
 Filters trigger standard PowerShell functions. The nested content is passed via the pipeline. Params are used by their names.
@@ -180,6 +191,7 @@ Are supported as defined by PugJS.
 - https://pugjs.org/language/includes.html
 - https://pugjs.org/language/mixins.html
 - https://pugjs.org/language/inheritance.html
+
 
 ---
 
