@@ -132,7 +132,7 @@ PugPS handles PowerShell collections intelligently for clean attribute managemen
 - `attr="$a"`  var will be parsed (double quotes),
 - `$attr=$a`   var will be parsed (no quotes).
 
-### 4. Filters & Includes
+### 4. Filters
 Filters trigger standard PowerShell functions. The nested content is passed via the pipeline. Params are used by their names.
 
 ```pug
@@ -172,6 +172,14 @@ plist(version="1.0")
     ...
 ```
 A specific doctype for SVG Tiny 1.1 and 1.2 is not recomended. Only use: `doctype xml`
+
+
+### 6. Includes & Mixins & Template Inheritance (Extends)
+Are supported as defined by PugJS.
+
+- https://pugjs.org/language/includes.html
+- https://pugjs.org/language/mixins.html
+- https://pugjs.org/language/inheritance.html
 
 ---
 
