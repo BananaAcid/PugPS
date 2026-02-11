@@ -13,7 +13,7 @@ To use PugPS as your view engine in a [Pode](https://badgerati.github.io/Pode/) 
 ```powershell
 Start-PodeServer {
     # Import the view engine module
-    Import-Module .\PugPS\pode-pug-engine
+    Import-Module .\PugPS\PugPS
     
     # Configure the engine
     Set-PodeViewEnginePug -Extension 'pode.pug' -ErrorOutput 'text'
@@ -41,6 +41,8 @@ Start-PodeServer {
 Use `Invoke-PUG` for automation, build pipelines, or one-off conversions.
 
 ```powershell
+Import-Module .\PugPS\PugPS
+
 # Example 1: Convert a file with data and external filters
 Invoke-PUG -Path .\test.pug -Data @{
     Title = "Pug PowerShell"

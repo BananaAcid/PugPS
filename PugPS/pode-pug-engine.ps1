@@ -158,4 +158,4 @@ Function Set-PodeViewEnginePug {
 
 
 
-Export-ModuleMember -Function Set-PodeViewEnginePug
+#Export-ModuleMember -Function Set-PodeViewEnginePug
