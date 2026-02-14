@@ -107,7 +107,7 @@
             # IconUri = 'https://github.com/BananaAcid/PugPS'
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'https://github.com/BananaAcid/PugPS/tags'
+            ReleaseNotes = 'https://github.com/BananaAcid/PugPS/releases'
 
             # Prerelease string of this module
             # Prerelease = ''
