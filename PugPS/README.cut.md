@@ -51,6 +51,7 @@ Start-PodeServer {
 | **-KebabCaseHTML** | `bool` | No | `$true` | When `$true`, `CamelCase` tags in PUG are converted to `kebab-case`. |
 | **-ErrorOutput** | `string` | No | `'rethrow'` | `'text'` returns HTML error; `'rethrow'` triggers the Pode error page. |
 | **-ErrorContextRange** | `int` | No | `2` | Number of context lines to show before and after the error line. |
+| **-NoCache** | `switch` | No | `$false` | When `$true`, the internal cache is not used. |
 
 ---
 

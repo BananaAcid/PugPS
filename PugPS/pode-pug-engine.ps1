@@ -9,7 +9,7 @@
     of this software and associated documentation files.
 #>
 
-# @{filename = @{sb = scriptblock; LastWriteTime = [datetime]}}
+# @{ filenameStr.. = @{sb = scriptblock; LastWriteTime = datetime, Dependencies = @{filenamestr.. = fileinfo}} }
 $cache = [Hashtable]@{}
 
 # ADD a view engine for Pug, and SET as default and only view engine for files without extension
@@ -42,9 +42,18 @@ Function Set-PodeViewEnginePug {
         [Parameter(Mandatory=$false, HelpMessage="When text, an empty page with ony the error is generated, if `"rethrow`" is used, the Pode errorpage for 422 is triggered. Default is `"text`".")]
         [ValidateSet("text", "rethrow")]
         [string]$ErrorOutput = "rethrow",
-
+        
         [Parameter(Mandatory=$false, HelpMessage="Number of context lines to show before and after the error line.")]
-        [int]$ErrorContextRange = 2
+        [int]$ErrorContextRange = 2,
+
+        [Parameter(Mandatory=$false, HelpMessage="When true, the internal cache is not used. Default is false.")]
+        [switch]$NoCache = $false,
+
+        [Parameter(Mandatory=$false, HelpMessage="Debug switch for showing cache info.")]
+        [switch]$CacheDebug = $false,
+
+        [Parameter(Mandatory=$false, HelpMessage="Debug switch for saving converted PUG content.")]
+        [switch]$ConvertDebug = $false
     )
 
     Set-PodeViewEngine -Type 'Pug' -Extension $Extension -ScriptBlock {
@@ -74,15 +83,44 @@ Function Set-PodeViewEnginePug {
         }
 
         try {
-            if (($using:cache).ContainsKey($path) -and `
-                ($using:cache)[$path].LastWriteTime -eq (Get-Item $path).LastWriteTime)
-            {
-                # 1. get from cache
-                # 2. is a created scriptblock
-                Write-Host "[PUG:CHACHE] Use for $path"
-                $sb = ($using:cache)[$path].sb
+            $cached = $false
+
+            if (-not $using:NoCache) {
+                
+                if ($using:CacheDebug) {
+                    Write-Host ("[PUG:CACHE] Cache length: " + ($using:cache).Count) -ForegroundColor Green
+                    Write-Host ("[PUG:CACHE] Check for $path - In cache: " + ($using:cache).ContainsKey($path)) -ForegroundColor Green
+                }
+
+                if (($using:cache).ContainsKey($path) -and `
+                    ($using:cache)[$path].LastWriteTime -eq (Get-Item $path).LastWriteTime)
+                {
+                    $cached = $true
+                    # 1. check for changed Dependencies
+                    foreach ($dep in ($using:cache)[$path].Dependencies.GetEnumerator()) {
+                        if ($using:CacheDebug) { Write-Host ("[PUG:CACHE]  - Check for $($dep.Key): unchanged ") -ForegroundColor Green -NoNewline }
+
+                        if ($dep.Value.LastWriteTime -ne (Get-Item $dep.Key).LastWriteTime) {
+                            if ($using:CacheDebug) { Write-Host "False" -ForegroundColor Red }
+                            $cached = $false
+                            break
+                        }
+                        else {
+                            if ($using:CacheDebug) { Write-Host "True" -ForegroundColor Green }
+                        }
+                    }
+
+                    if ($cached) {
+                        if ($using:CacheDebug) { Write-Host "[PUG:CACHE] = Use cached" -ForegroundColor Green }
+                        # 2. get from cache, is a created scriptblock
+                        $sb = ($using:cache)[$path].sb                
+                    }
+                }
             }
-            else {
+
+            if (-not $cached) {
+                $RefIncludes = @{}
+
                 # 1. Transpile
                 $psCode = Convert-PugToPowerShell `
                     -Path $path `
@@ -92,15 +130,34 @@ Function Set-PodeViewEnginePug {
                     -VoidTagsSelfClosing $using:VoidTagsSelfClosing `
                     -ContainerTagsSelfClosing $using:ContainerTagsSelfClosing `
                     -KebabCaseHTML $using:KebabCaseHTML `
-                    -ErrorContextRange $using:ErrorContextRange
+                    -ErrorContextRange $using:ErrorContextRange `
+                    -RefIncludes $RefIncludes
                 
-                # debug
-                #$psCode | Out-File "_generated_template_.ps1"
+                    
+                if ($using:ConvertDebug) {
+                    # Replace any problematic pathstr chars for filename
+                    $tempdir = (Get-Item ([System.IO.Path]::GetTempPath())).FullName
+                    $saveFilenamePath = $path -replace "[^a-zA-Z0-9]","_"
+                    $tempFile = Join-Path $tempdir ("_generated_template_" + $saveFilenamePath + ".ps1")
+
+                    # save to OS Temp with save filename
+                    $psCode | Out-File $tempFile
+                    Write-Host "[PUG:CONVERT] Generated file (for debugging): $tempFile" -ForegroundColor Green
+                }
+
                 
                 # 2. Create ScriptBlock
                 $sb = [scriptblock]::Create($psCode)
-                Write-Host "[PUG:CACHE] Created for $path"
-                ($using:cache)[$path] = @{sb = $sb; LastWriteTime = (Get-Item $path).LastWriteTime}
+
+                if (-not $using:NoCache) {
+                    ($using:cache)[$path] = @{sb = $sb; LastWriteTime = (Get-Item $path).LastWriteTime; Dependencies = $RefIncludes}
+
+                    if ($using:CacheDebug) {
+                        Write-Host "[PUG:CACHE] = Add to cache" -ForegroundColor Green
+                        Write-Host ("[PUG:CACHE]   - Dependencies added: " + $RefIncludes.Count) -ForegroundColor Green
+                    }
+                }
+
             }
 
             # 3. Execute, passing $data into the scope
@@ -111,7 +168,7 @@ Function Set-PodeViewEnginePug {
         }
         catch {
             # remove faulty scriptblock from cache
-            Write-Host "[PUG:CACHE] Error -> Remove $path"
+            if ($using:CacheDebug) { Write-Host "[PUG:CACHE] Error -> Remove $path" -ForegroundColor Green }
             ($using:cache).Remove($path)
 
             $ex = $_.Exception

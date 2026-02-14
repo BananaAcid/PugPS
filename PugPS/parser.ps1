@@ -90,7 +90,10 @@ function Convert-PugToPowerShell {
         [bool]$KebabCaseHTML = $true,
 
         [Parameter(Mandatory=$false, HelpMessage="Number of context lines to show before and after the error line.")]
-        [int]$ErrorContextRange = 2
+        [int]$ErrorContextRange = 2,
+
+        [Parameter(Mandatory=$false, HelpMessage="When passed in, it will be used to store the list of all included files.")]
+        [hashtable]$RefIncludes = @{} # path -> System.IO.FileInfo
     )
 
     begin {
@@ -574,6 +577,7 @@ function Convert-PugToPowerShell {
 
         function Get-TraceLine([PSObject]$l) {
             $safePath = $l.Path.Replace("'", "''")
+            if ($path -ne "Stream") { $RefIncludes[$l.Path] = [System.IO.FileInfo]($l.Path) }
             return "`$pug_src_line=$($l.Line);`$pug_src_path='$safePath'; "
         }
 
@@ -645,7 +649,7 @@ function Out-PugMergedAttrs($inline, $exploded) {
     $exDict = @{}
     if ($exploded -is [System.Collections.IDictionary]) {
          $exploded.Keys | ForEach-Object { $exDict[$_] = $exploded[$_] }
-    } elseif ($exploded -ne $null) {
+    } elseif ($null -ne $exploded) {
          if ($exploded.PSObject) {
             foreach($prop in $exploded.PSObject.Properties) {
                 if ($prop.CanRead) { $exDict[$prop.Name] = $prop.Value }
